@@ -109,6 +109,7 @@ NSString *const ATLAvatarImageViewAccessibilityLabel = @"ATLAvatarImageViewAcces
 
 - (void)setAvatarItem:(id<ATLAvatarItem>)avatarItem
 {
+    _avatarItem = avatarItem;
     if ([avatarItem avatarImageURL]) {
         self.initialsLabel.text = nil;
         [self loadAvatarImageWithURL:[avatarItem avatarImageURL]];
@@ -119,7 +120,6 @@ NSString *const ATLAvatarImageViewAccessibilityLabel = @"ATLAvatarImageViewAcces
         self.image = nil;
         self.initialsLabel.text = avatarItem.avatarInitials;
     }
-    _avatarItem = avatarItem;
 }
 
 - (void)setInitialsColor:(UIColor *)initialsColor
@@ -146,7 +146,7 @@ NSString *const ATLAvatarImageViewAccessibilityLabel = @"ATLAvatarImageViewAcces
     self.backgroundColor = imageViewBackgroundColor;
     _imageViewBackgroundColor = imageViewBackgroundColor;
 }
-         
+
 - (void)loadAvatarImageWithURL:(NSURL *)imageURL
 {
     if (![imageURL isKindOfClass:[NSURL class]] || imageURL.absoluteString.length == 0) {
@@ -157,7 +157,8 @@ NSString *const ATLAvatarImageViewAccessibilityLabel = @"ATLAvatarImageViewAcces
     // Check if image is in cache
     __block NSString *stringURL = imageURL.absoluteString;
     UIImage *image = [[[self class] sharedImageCache] objectForKey:stringURL];
-    if (image) {
+    
+    if (image && [stringURL isEqualToString:[self.avatarItem avatarImageURL].absoluteString]) {
         self.image = image;
         return;
     }
@@ -174,6 +175,9 @@ NSString *const ATLAvatarImageViewAccessibilityLabel = @"ATLAvatarImageViewAcces
             if (image) {
                 [[[self class] sharedImageCache] setObject:image forKey:remoteImageURL.absoluteString cost:0];
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    if(![remoteImageURL.absoluteString isEqualToString:[self.avatarItem avatarImageURL].absoluteString]) {
+                        return;
+                    }
                     [self updateWithImage:image forRemoteImageURL:remoteImageURL];
                 });
             }
@@ -201,5 +205,5 @@ NSString *const ATLAvatarImageViewAccessibilityLabel = @"ATLAvatarImageViewAcces
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.initialsLabel attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:3]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.initialsLabel attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-3]];
 }
-    
+
 @end
