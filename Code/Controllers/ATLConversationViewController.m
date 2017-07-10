@@ -34,7 +34,7 @@
 
 @import AVFoundation;
 
-@interface ATLConversationViewController () <UICollectionViewDataSource, UICollectionViewDelegate, CLLocationManagerDelegate>
+@interface ATLConversationViewController () <UICollectionViewDataSource, CLLocationManagerDelegate>
 
 @property (nonatomic) ATLConversationDataSource *conversationDataSource;
 @property (nonatomic, readwrite) LYRQueryController *queryController;
